@@ -1,0 +1,10 @@
+#!/bin/sh
+
+uci -q batch <<-EOF >/dev/null
+        set fros.reboot=reboot
+        set fros.reboot.enable='0'
+        set fros.reboot.day='-1'
+        set fros.reboot.time='03:00'
+        commit fros
+EOF
+exit 0

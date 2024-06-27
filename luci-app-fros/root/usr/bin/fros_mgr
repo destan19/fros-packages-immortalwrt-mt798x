@@ -1,0 +1,93 @@
+#!/bin/sh
+
+. /lib/functions.sh
+
+IPATH="/tmp/fros"
+log()
+{
+	echo "$1" >>/tmp/log/fros_install.log
+}
+
+install()
+{
+	local pkg_file=$1
+	mkdir $IPATH
+	tar -zxvf $pkg_file -C $IPATH  >/dev/null
+	if [ $? -ne 0 ];then
+		return 2
+	fi
+	cd $IPATH
+	if [ ! -f fros.sh ];then
+		return 2
+	fi
+	cp fros.sh /usr/bin/
+	chmod 777 /usr/bin/fros.sh
+	/usr/bin/fros.sh install  >/dev/null
+	if [ $? -ne 0 ];then
+		#rm $IPATH -fr
+		return 1
+	else
+		#rm $IPATH -fr
+		return 0
+	fi
+}
+uninstall()
+{
+	if [ -f /usr/bin/fros.sh ];then
+		/usr/bin/fros.sh uninstall >/dev/null
+	fi
+}
+
+TMP_FILE="/tmp/fros.tar.gz"
+upgrade(){
+	url=$1
+	if [ -f /tmp/upgrade_result ];then
+		echo "" >/tmp/upgrade_result
+	fi
+	wget $url -O $TMP_FILE -T 5 -t 1 >/dev/null
+	if [ $? -ne 0 ];then
+		echo "40001"
+		log "download fros package failed"
+		return
+	fi
+	log "download fros package ok"
+	uninstall
+	install $TMP_FILE
+	local ret=$?
+	if [ $ret -eq 2 ];then
+		echo "40002"
+		log "fros package format error"
+		return
+	elif [ $ret -eq 1 ];then
+		log "install fros package failed"
+		echo "40003"
+		return
+	fi
+	log "install fros ...ok"
+	echo "20000"
+}
+echo "" >/tmp/log/fros_install.log
+action=$1
+case $action in
+"install")
+	log "install"
+	install $2
+	if [ $? -ne 0 ];then
+		return 1
+	else
+		return 0 
+	fi
+;;
+"uninstall")
+	log "uninstall"
+	uninstall $2
+;;
+"upgrade")
+	log "begin upgrade"
+	upgrade $2
+;;
+*)
+	echo "error..."
+;;
+esac
+

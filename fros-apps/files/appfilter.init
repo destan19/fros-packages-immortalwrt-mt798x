@@ -1,0 +1,73 @@
+#!/bin/sh /etc/rc.common
+. /usr/share/libubox/jshn.sh
+. /lib/functions.sh
+
+START=42
+USE_PROCD=1
+OAFD_BIN="/usr/bin/oafd"
+
+service_triggers()
+{
+	procd_add_reload_trigger "appfilter"
+}
+
+stop_service(){
+	killall -SIGUSR2 oafd
+	sleep 3
+	killall -9 oafd
+	rmmod dpi_filter
+}
+update_web_server_param(){
+	local max_req=`uci get uhttpd.main.max_requests`
+	if [ $max_req -lt 5 ];then
+			uci set uhttpd.main.max_requests=100
+			uci commit uhttpd
+			/etc/init.d/uhttpd restart
+	fi
+}
+
+
+init_feature(){
+    ft_tool
+}
+
+
+start_service(){
+	# 798x hnat
+	echo 0 >/sys/kernel/debug/hnat/hook_toggle
+	update_web_server_param
+	if [ ! -d /tmp/config ];then
+		mkdir /tmp/config
+	fi
+
+	#for flow statistics
+	if [ ! -f /tmp/config/tmp_user ];then
+                if [ -f /etc/config/child_guard_user ];then
+                        cp /etc/config/child_guard_user /tmp/config/tmp_user
+                else
+                        touch /tmp/config/tmp_user
+                fi
+        fi
+
+	if [ ! -f /tmp/config/oaf ];then
+		cp /etc/tmp_config/oaf /tmp/config
+	fi
+	init_feature
+	if [ -f /lib/modules/dpi_filter.ko ];then
+		insmod /lib/modules/dpi_filter.ko
+	else
+		insmod dpi_filter
+	fi
+	rule_apply mac_group reload
+	rule_apply app_filter reload
+	rule_apply mac_filter reload
+	rule_apply port_filter reload
+	rule_apply url_filter reload
+	rule_apply app_delay reload
+	rule_apply video_app_filter reload
+	procd_open_instance
+	procd_set_param respawn 60 5 5
+	procd_set_param stderr 1
+	procd_set_param command "$OAFD_BIN"
+	procd_close_instance
+}

@@ -1,0 +1,7 @@
+{
+	"chip": "mt7981",
+	"radio_num": 2,
+	"wifi_driver_type": 3,
+	"support_wisp": 0,
+	"support_hwnat": 1
+}

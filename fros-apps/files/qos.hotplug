@@ -1,0 +1,10 @@
+[ -n "$DEVICE" ] || exit 0
+
+if [ x"lo" == x"$DEVICE" ];then
+	exit 0
+fi
+if [ "$ACTION" = ifdown ]; then
+	/etc/init.d/fros_qos stop
+else
+	/etc/init.d/fros_qos restart
+fi
