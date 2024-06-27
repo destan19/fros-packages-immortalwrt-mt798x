@@ -38,12 +38,10 @@ endef
 define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/etc/uci-defaults
 	$(INSTALL_BIN) ./files/etc/uci-defaults/* $(1)/etc/uci-defaults/
-	$(INSTALL_DIR) $(1)/etc/certs
 	#$(INSTALL_DATA) ./files/etc/config/* $(1)/etc/config/
 	$(INSTALL_DATA) ./files/etc/version $(1)/etc/
 	$(INSTALL_DATA) ./files/etc/f_type $(1)/etc/
 	$(INSTALL_DATA) ./files/etc/product_feature $(1)/etc/
-	$(INSTALL_DATA) ./files/etc/certs/* $(1)/etc/certs
 
 endef
 
