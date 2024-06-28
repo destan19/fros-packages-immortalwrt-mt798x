@@ -57,7 +57,7 @@ define Package/$(PKG_NAME)/install
 	$(CP) $(PKG_BUILD_DIR)/*.so $(1)/usr/lib/
 	$(CP) ./files/configs/* $(1)/etc/config
 
-	$(CP) ./files/tmp_oaf.config $(1)/etc/tmp_config/oaf
+	$(CP) ./files/tmp_oaf $(1)/etc/tmp_config/oaf
 	$(CP) ./files/feature.bin $(1)/etc/appfilter/feature.bin
 	$(CP) ./files/app_class.txt $(1)/etc/appfilter/
 	$(INSTALL_DATA) ./files/oui/* $(1)/etc/oui
