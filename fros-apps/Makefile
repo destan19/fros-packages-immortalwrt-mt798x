@@ -12,7 +12,7 @@ include $(INCLUDE_DIR)/package.mk
 define Package/fros
   SECTION:=Fros Apps
   CATEGORY:=Fros Apps
-  DEPENDS:=+libuci +libjson-c +libblobmsg-json +libubox +libubus +libmosquitto +libcurl +openssl-util
+  DEPENDS:=+libuci +libjson-c +libblobmsg-json +libubox +libubus +libmosquitto +libcurl +openssl-util +luci +luci-compat +uhttpd
   TITLE:=fros
 endef
 
